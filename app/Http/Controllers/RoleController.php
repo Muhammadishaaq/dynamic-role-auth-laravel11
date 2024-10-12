@@ -8,42 +8,44 @@ use Spatie\Permission\Models\Permission;
 
 class RoleController extends Controller
 {
-    // Show all roles
     public function index()
     {
-        $roles = Role::all();
-        return view('partials.role.index', compact('roles'));
+        $roles = Role::with('permissions')->get();  
+        return view('modules.partials.role.index', compact('roles'));
     }
 
-    // Show form to create a new role
+
     public function create()
     {
-        return view('partials.role.create');
+        $permissions = Permission::all();
+        return view('modules.partials.role.create', compact('permissions'));
     }
 
-    // Store a new role
     public function store(Request $request)
     {
-        $request->validate(['name' => 'required|unique:roles,name']);
-        Role::create(['name' => $request->name]);
-        return redirect()->route('roles.index')->with('success', 'Role created successfully!');
+        $request->validate([
+            'name' => 'required|unique:roles,name',
+            'permissions' => 'required|array',
+            'permissions.*' => 'exists:permissions,id',
+        ]);
+
+        $role = Role::create(['name' => $request->name]);
+        $role->permissions()->sync($request->permissions);
+
+        return redirect()->route('roles.index')->with('success', 'Role created and permissions assigned successfully!');
     }
 
-    // Show form to edit a role
     public function edit(Role $role)
     {
-        return view('partials.role.edit', compact('role'));
+        return view('modules.partials.role.edit', compact('role'));
     }
 
-    // Update the role
     public function update(Request $request, Role $role)
     {
         $request->validate(['name' => 'required|unique:roles,name,' . $role->id]);
         $role->update(['name' => $request->name]);
         return redirect()->route('roles.index')->with('success', 'Role updated successfully!');
     }
-
-    // Delete the role
     public function destroy(Role $role)
     {
         $role->delete();
@@ -52,31 +54,18 @@ class RoleController extends Controller
 
     public function assign($id)
     {
-        // Find the role by ID
         $role = Role::findOrFail($id);
-        // Get all available permissions
         $permissions = Permission::all();
-
-        // Return the view with the role and available permissions
-        return view('partials.role.assign', compact('role', 'permissions'));
+        return view('modules.partials.role.assign', compact('role', 'permissions'));
     }
-
-    // Handle assigning permissions to a role
     public function assignPermission(Request $request, $id)
     {
-        // Validate the request
         $request->validate([
             'permissions' => 'required|array',
             'permissions.*' => 'exists:permissions,id',
         ]);
-
-        // Find the role by ID
         $role = Role::findOrFail($id);
-
-        // Assign the permissions to the role
         $role->permissions()->sync($request->permissions);
-
-        // Redirect back with a success message
         return redirect()->route('roles.index')->with('success', 'Permissions assigned successfully!');
     }
 }

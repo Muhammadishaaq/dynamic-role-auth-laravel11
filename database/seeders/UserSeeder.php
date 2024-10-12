@@ -3,28 +3,34 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
-        // Create roles
-        $adminRole = Role::create(['name' => 'admin']);
+        // Reset cached roles and permissions
+        app()['cache']->forget('spatie.permission.cache');
 
-        // Create an admin user and assign role
-        $admin = User::create([
-            'name' => 'Admin',
-            'email' => 'admin@gmail.com',
-            'password' => Hash::make('password'),
-            'phone' => '1234567890',
-            'address' => 'Islamabad',
-        ]);
-        $admin->assignRole($adminRole); // Assign the admin role
+        // Create roles and assign created permissions
 
+        // Hr role
+        $adminRole = Role::create(['name' => 'Admin']);
+        $adminRole->givePermissionTo(Permission::all());
+
+        // Create Admin user
+        $admin = new User();
+        $admin->name = 'Admin';
+        $admin->email = 'admin@gmail.com';
+        $admin->password = Hash::make('password');
+        $admin->email_verified_at = now();
+        $admin->position = 'CEO';
+        $admin->department = 'Head';
+        $admin->phone_number = '1234567890';
+        $admin->save();
+        $admin->assignRole('Admin');
     }
 }
-
-

@@ -2,17 +2,17 @@
 <html lang="en">
 
 <head>
-    @include('../layouts.components.header')
+    @include('../modules/layouts.components.header')
 </head>
 
 <body class="hold-transition sidebar-mini">
     <!-- Site wrapper -->
     <div class="wrapper">
         <!-- Navbar -->
-        @include('../layouts.components.nav')
+        @include('../modules/layouts.components.nav')
         <!-- /.navbar -->
         <!-- Main Sidebar Container -->
-        @include('../layouts.components.sidebar')
+        @include('../modules/layouts.components.sidebar')
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             
@@ -21,12 +21,12 @@
             <!-- /.content -->
         </div>
         <!-- /.content-wrapper -->
-        @include('../layouts/components/footer')
+        @include('../modules/layouts/components/footer')
 
     </div>
     <!-- ./wrapper -->
     <!-- jQuery -->
-    @include('../layouts/components/scriptpart')
+    @include('../modules/layouts/components/scriptpart')
 
 </body>
 
